@@ -28,6 +28,8 @@ def get_random_apod():
     return response.json()
 
 
+# асинхронная функция, которая будет брать всю информацию, полученную из переменной random_apod
+# Отдельно сохраняем фото и заголовок и описание. Настраиваем отправку сообщения
 @dp.message(Command('random_apod'))
 async def random_apod(message: Message):
     apod = get_random_apod()
