@@ -7,18 +7,14 @@ import requests
 import logging
 from keyboards import keyboard
 from jokeapi import Jokes # Import the Jokes class
+from googletrans import Translator  # Импортируем библиотеку для перевода
 
 logging.basicConfig(level=logging.INFO)
 
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-
-
-
-
-
-
+translator = Translator()  # Создаем объект для перевода
 
 # Обработчик команды /start
 @dp.message(CommandStart())
@@ -30,16 +26,20 @@ async def start(message: Message):
 #  JokeAPI может возвращать шутки двух типов:
 #    - `single`: шутка, состоящая из одного предложения. Шутка содержится в поле `joke`.
 #    - `twopart`: шутка, состоящая из двух частей — зачин (setup) и развязка (delivery).
+# blacklist=['nsfw', 'racist'])  - Will return a joke that does not have either the flag "nsfw" or "racist".
 @dp.callback_query(F.data == 'random_joke')
 async def random_joke(callback: CallbackQuery):
     j = await Jokes()  # Initialise the class
-    joke = await j.get_joke()  # Retrieve a random joke
+    joke = await j.get_joke(blacklist=['nsfw', 'racist'])
     if joke['type'] == 'single':
-        r_joke = joke['joke']
+        translated_joke_no_text = await translator.translate(joke['joke'], dest='ru')
+        translated_joke = translated_joke_no_text.text
     else:
-        r_joke = f"{joke['setup']} - {joke['delivery']}"
+        translated_setup = await translator.translate(joke['setup'], dest='ru')
+        translated_delivery = await translator.translate(joke['delivery'], dest='ru')
+        translated_joke = f"- {translated_setup.text}\n - {translated_delivery.text}"
     await callback.answer('Произвольная шутка подобрана!')
-    await callback.message.answer('Шутка:', r_joke)
+    await callback.message.answer(f'Шутка:\n {translated_joke}')
 
 
 async def main():
