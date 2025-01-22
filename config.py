@@ -4,5 +4,5 @@ API_NASA_KEY = '9jBc0DWaIwV7fAMDBIjgXb7DN7MnUBotxnAJXpW3'
 
 TOKEN = '7868972083:AAHjnClkScE-lIJvTrzR3quHuiyXpPgy2nc'
 API_GIF = 'AIzaSyB8AkrNbs5zpgaPDNIaBK-VnUbuMgi-ZuY'
-JOKE_API_URL = 'https://v2.jokeapi.dev/joke/'
+
 
