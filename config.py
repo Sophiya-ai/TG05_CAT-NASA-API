@@ -1,2 +1,2 @@
 TOKEN_CW = '8128353058:AAHxAt8ixolikuac8WfLxCMC67hNWhZe-Ts'
-API_CAT = 'live_TnGjXlhO7dBXV7jiaFo8TX3qoFSxIiaJvDXUZuIVewz7dPg93Hx8p2zqyd6D7b8u'
+API_CAT_KEY = 'live_TnGjXlhO7dBXV7jiaFo8TX3qoFSxIiaJvDXUZuIVewz7dPg93Hx8p2zqyd6D7b8u'
