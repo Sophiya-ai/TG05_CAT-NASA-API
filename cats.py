@@ -1,20 +1,20 @@
 import asyncio
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import CommandStart, Command
+from aiogram import Bot, Dispatcher
+from aiogram.filters import CommandStart
 from aiogram.types import Message
-import random
+
 from config import TOKEN_CW, API_CAT_KEY
 import requests
 
 bot = Bot(token=TOKEN_CW)
 dp = Dispatcher()
 
-# Для отправки GET-запроса создаём response и возвращаем ответ в формате JSON
-# To get more than 10, and additional fields then be sure to use your API Key
-# from the welcome email as the 'x-api-key' header
-# `headers` — это словарь, содержащий заголовки HTTP для авторизации, которые вы хотите включить в запрос.
-# Заголовки могут включать информацию о типе контента, настройках авторизации и другие параметры,
-# необходимые для правильной обработки запроса сервером
+# - Для отправки GET-запроса создаём response и возвращаем ответ в формате JSON
+# - To get more than 10, and additional fields then be sure to use your API Key
+#   from the welcome email as the 'x-api-key' header
+# - `headers` — это словарь, содержащий заголовки HTTP для авторизации, которые вы хотите включить в запрос.
+#    Заголовки могут включать информацию о типе контента, настройках авторизации и другие параметры,
+#    необходимые для правильной обработки запроса сервером
 def get_cat_breeds():
     url = 'https://api.thecatapi.com/v1/breeds'
     headers = {'x-api-key': API_CAT_KEY}
@@ -23,8 +23,8 @@ def get_cat_breeds():
 
 
 # получение картинки кошки по породе Добавляем URL.
-# В документации дан адрес для получения картинки бенгальских кошек. Используем f-строку,
-# чтобы получить изображение для других пород
+# В документации дан адрес для получения картинки бенгальских кошек.
+# Используем f-строку, чтобы получить изображение для других пород
 # Прописываем заголовок, запрос и возвращение первого элемента ответа. Ответ сохраняем в переменную
 def get_cat_image_by_breed(breed_id):
     url = f'https://api.thecatapi.com/v1/images/search?breed_ids={breed_id}'
@@ -36,9 +36,10 @@ def get_cat_image_by_breed(breed_id):
 
 
 # получение информации о породе
-#  в breeds -  будут сохраняться все породы
-# Перебираем породы внутри их списка, находим нужное нам значение. lower - для приведения всего текста к нижнему регистру
-# возврат None на тот случай, если мы не нашли породу, которую искали
+# - в breeds -  будут сохраняться все породы
+# - Перебираем породы внутри их списка, находим нужное нам значение.
+#   lower - для приведения всего текста к нижнему регистру
+#   возврат None на тот случай, если мы не нашли породу, которую искали
 def get_breed_info(breed_name):
     breeds = get_cat_breeds()
     for breed in breeds:
