@@ -8,7 +8,7 @@ import logging
 from keyboards import keyboard
 from jokeapi import Jokes  # Import the Jokes class
 from googletrans import Translator  # Импортируем библиотеку для перевода
-import json
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -22,8 +22,8 @@ def search_gif(search_term):
     url = f"https://tenor.googleapis.com/v2/search?q={search_term}&key={API_GIF}&limit=1"
     response = requests.get(url)
     if response.status_code == 200:
-        top_gif = json.loads(response.content)
-        return top_gif #data['results'][0]['media'][0]['gif']['url']
+        data = response.json()
+        return data['results'][0]['media_formats']['gif']['url'] #вывела json в консоль и нашла путь к url
     return None
 
 
@@ -68,8 +68,23 @@ async def text_message_handler(message: Message):
     search_term = message.text
     search_term_en = await translator.translate(search_term.lower(), dest='en')
     gif_url = search_gif(search_term_en)
+
+    # try:
+    #     # Check if the URL is a direct link to a GIF
+    #     response = requests.head(gif_url)
+    #     content_type = response.headers.get('Content-Type')
+    #
+    #     if content_type == 'image/gif':
+    #         # Send the GIF
+    #         await message.answer_animation(animation=gif_url, caption='Лучшая гифка в соответствии с вашим запросом')
+    #     else:
+    #         await message.reply("The provided URL does not point to a valid GIF file.")
+    #
+    # except Exception as e:
+    #     await message.reply(f"An error occurred: {str(e)}")
+
     if gif_url:
-        await message.answer_photo(photo=gif_url, caption='Лучшая гифка в соответствии с вашим запросом')
+        await message.answer_animation(animation=gif_url, caption='Лучшая гифка в соответствии с вашим запросом')
     else:
         await message.answer("Не удалось найти GIF по вашему запросу.")
 
