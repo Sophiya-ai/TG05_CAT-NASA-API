@@ -8,6 +8,7 @@ import logging
 from keyboards import keyboard
 from jokeapi import Jokes  # Import the Jokes class
 from googletrans import Translator  # Импортируем библиотеку для перевода
+import json
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,11 +19,11 @@ translator = Translator()  # Создаем объект для перевода
 
 # Функция для поиска GIF по ключевым словам
 def search_gif(search_term):
-    url = f"https://g.tenor.com/v1/search?q={search_term}&key={API_GIF}&limit=1"
+    url = f"https://tenor.googleapis.com/v2/search?q={search_term}&key={API_GIF}&limit=1"
     response = requests.get(url)
     if response.status_code == 200:
-        data = response.json()
-        return data['results'][0]['media'][0]['gif']['url']
+        top_gif = json.loads(response.content)
+        return top_gif #data['results'][0]['media'][0]['gif']['url']
     return None
 
 
@@ -33,6 +34,7 @@ async def start(message: Message):
                          "Выберите опцию", reply_markup=keyboard)
 
 
+#  ---- Обработка кнопки - Случайная шутка ----
 #  JokeAPI может возвращать шутки двух типов:
 #    - `single`: шутка, состоящая из одного предложения. Шутка содержится в поле `joke`.
 #    - `twopart`: шутка, состоящая из двух частей — зачин (setup) и развязка (delivery).
@@ -52,11 +54,20 @@ async def random_joke(callback: CallbackQuery):
     await callback.message.answer(f'Шутка:\n {translated_joke}')
 
 
+#  ---- Обработка кнопки - Популярный GIF ----
+# Ввод запроса
+@dp.callback_query(F.data == 'gif')
+async def gif(callback: CallbackQuery):
+    await callback.answer('Ключевое слово введено')
+    await callback.message.answer('Введите ключевое слово для поиска GIF')
+
+
+# Поиск по запросу (реагирует на любое введенное сообщение)
 @dp.message()
 async def text_message_handler(message: Message):
     search_term = message.text
-    search_term_en = await translator.translate(search_term, dest='en')
-    gif_url = await search_gif(search_term_en)
+    search_term_en = await translator.translate(search_term.lower(), dest='en')
+    gif_url = search_gif(search_term_en)
     if gif_url:
         await message.answer_photo(photo=gif_url, caption='Лучшая гифка в соответствии с вашим запросом')
     else:
