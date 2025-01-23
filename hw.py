@@ -6,7 +6,7 @@ from config import TOKEN, API_GIF
 import requests
 import logging
 from keyboards import keyboard
-from jokeapi import Jokes  # Import the Jokes class
+from jokeapi import Jokes  # Import the Jokes class (https://github.com/benjhar/JokeAPI-Python#readme)
 from googletrans import Translator  # Импортируем библиотеку для перевода
 
 
@@ -46,12 +46,14 @@ async def random_joke(callback: CallbackQuery):
     if joke['type'] == 'single':
         translated_joke_no_text = await translator.translate(joke['joke'], dest='ru')
         translated_joke = translated_joke_no_text.text
+        joke_en = joke['joke']
     else:
         translated_setup = await translator.translate(joke['setup'], dest='ru')
         translated_delivery = await translator.translate(joke['delivery'], dest='ru')
         translated_joke = f"- {translated_setup.text}\n - {translated_delivery.text}"
+        joke_en = f"- {joke['setup']}\n - {joke['delivery']}"
     await callback.answer('Произвольная шутка подобрана!')
-    await callback.message.answer(f'Шутка:\n {translated_joke}')
+    await callback.message.answer(f'Шутка:\n {translated_joke}\n \n Joke: \n {joke_en}')
 
 
 #  ---- Обработка кнопки - Популярный GIF ----
