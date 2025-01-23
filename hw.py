@@ -6,15 +6,25 @@ from config import TOKEN, API_GIF
 import requests
 import logging
 from keyboards import keyboard
-from jokeapi import Jokes # Import the Jokes class
+from jokeapi import Jokes  # Import the Jokes class
 from googletrans import Translator  # Импортируем библиотеку для перевода
 
 logging.basicConfig(level=logging.INFO)
 
-
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 translator = Translator()  # Создаем объект для перевода
+
+
+# Функция для поиска GIF по ключевым словам
+def search_gif(search_term):
+    url = f"https://g.tenor.com/v1/search?q={search_term}&key={API_GIF}&limit=1"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return data['results'][0]['media'][0]['gif']['url']
+    return None
+
 
 # Обработчик команды /start
 @dp.message(CommandStart())
@@ -40,6 +50,17 @@ async def random_joke(callback: CallbackQuery):
         translated_joke = f"- {translated_setup.text}\n - {translated_delivery.text}"
     await callback.answer('Произвольная шутка подобрана!')
     await callback.message.answer(f'Шутка:\n {translated_joke}')
+
+
+@dp.message()
+async def text_message_handler(message: Message):
+    search_term = message.text
+    search_term_en = await translator.translate(search_term, dest='en')
+    gif_url = await search_gif(search_term_en)
+    if gif_url:
+        await message.answer_photo(photo=gif_url, caption='Лучшая гифка в соответствии с вашим запросом')
+    else:
+        await message.answer("Не удалось найти GIF по вашему запросу.")
 
 
 async def main():
